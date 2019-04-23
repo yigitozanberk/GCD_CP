@@ -2,6 +2,12 @@
 
 library(data.table)
 library(dplyr)
+library(stringr)
+
+#check if data is present. stop if data is missing.
+if(!dir.exists("./UCI HAR Dataset")) {
+        stop("UCI HAR Dataset is missing!")
+} else {
 
 #read class labels into data table MYAC
 MYAC <- data.table::fread("./UCI HAR Dataset/activity_labels.txt", 
@@ -14,7 +20,8 @@ MYAC <- MYAC[, .(classnum = as.numeric(classnum), activity)]
 MYFEAT <- data.table::fread("./UCI HAR Dataset/features.txt",
                             col.names = c("colnum", "mtype"))
 
-#get the row identifiers of wanted features into myvars for extraction
+#get the row identifiers of wanted features(mean and std) into myvars 
+#for extraction
 myvars1 <- grep("[Mm][Ee][Aa][Nn]\\(\\)", MYFEAT$mtype)
 myvars2 <- grep("[Ss][Tt][Dd]\\(\\)", MYFEAT$mtype)
 myvars <- c(myvars1, myvars2)
@@ -108,4 +115,5 @@ rm(MYAC, MYDATA, MYDATAEXTRACT, MYFEAT, myvars, myvars1, myvars2)
 # average of each variable for each activity and each subject
 TDAT2 <- TDAT[, lapply(.SD, mean) , by = c("ID", "activity")]
 
+} #if clause end.
 
