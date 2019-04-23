@@ -90,9 +90,22 @@ MYDATAEXTRACT <- MYDATA[, myvars]
 
 MYDATAEXTRACT <- as.data.table(MYDATAEXTRACT)
 
+#merge activity names of classnum values
 TDAT <- merge(MYDATAEXTRACT, MYAC, by = "classnum")
 
+#drop unnecessary classnum column
+TDAT <- TDAT[,2:69]
+
+#convert to data.table
+TDAT <- as.data.table(TDAT)
+
+#clean cache
+rm(MYAC, MYDATA, MYDATAEXTRACT, MYFEAT, myvars, myvars1, myvars2)
 
 
 
-#DROP THE FIRST CLASSNUM COLUMN AND MOVE TO POINT 4
+## SECOND INDEPENDENT DATA SET
+# average of each variable for each activity and each subject
+TDAT2 <- TDAT[, lapply(.SD, mean) , by = c("ID", "activity")]
+
+
