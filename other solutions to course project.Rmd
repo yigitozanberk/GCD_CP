@@ -1,0 +1,80 @@
+---
+title: "another solution"
+author: "yob"
+date: "4/23/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+library(dplyr)
+#cheching for existing file or not
+if(!file.exists("./getdata"){dir.create("./getdata")}
+fileurl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+destfile <- "./getdata/dataset.zip"
+#download data file
+downoad.file(fileurl,destfile,method="curl")
+if(!file.exists("dataset.zip)){unzip(destfile),exdir="getdata")}
+## 1.Merges the training and the test sets to create one data set.
+# merge x , y to get new dataset
+# x=value ,y=activity
+# read test data
+x_test<-read.table("./UCI HAR Dataset/test/x_test.txt")
+y_test<-read.table("./UCI HAR Dataset/test/y_test.txt")
+subject_test<-read.table("./UCI HAR Dataset/test/subject_test.txt")
+# read training data
+x_train <- read.table("./UCI HAR Dataset/train/x_train.txt")
+y_train <- read.table("./UCI HAR Dataset/train/y_train.txt")
+subject_train <- read.table("./UCI HAR Dataset/train/subject_train.txt")
+x_dataset <- rbind(x_test,x_train)
+y_dataset <- rbind(y_test,y_train)
+subject_dataset <- rbind(subject_test, subject_train)
+## 2.Extracts only the measurements on the mean and standard deviation for each measurement.
+#reding features table 
+features <- read.table("./UCI HAR Dataset/features.txt")
+#searching for mean , std 
+mean_std <- grepl("mean()",features[,2]) | grepl("std()",features[,2])
+#putting them as a new col in x_dataset
+x_dataset <- x_dataset[,mean_std]
+## 3.Uses descriptive activity names to name the activities in the data set
+#reading activity table 
+activities <- read.table("./UCI HAR Dataset/activity_labels.txt")
+#update values with correct activities'names
+y_dataset[, 1] <- activities[y_dataset[, 1], 2]
+#assign the correct col name
+names(y_dataset) <- "activity"
+## 4.Appropriately labels the data set with descriptive variable names.
+names(subject_dataset) <- "subject"
+#in a single dataset
+all_singledataset <- cbind(x_dataset, y_dataset, subject_dataset)
+colnames(all_singledataset) <- c("subject",features[,2],"activity")
+## 5.From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+Data2<-aggregate(. ~subject + activity, all_singledataset, mean)
+Data2<-Data2[order(Data2$subject,Data2$activity),]
+write.table(Data2, file = "tidy_data.txt",row.name=FALSE)
+
