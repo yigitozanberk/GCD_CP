@@ -115,5 +115,6 @@ rm(MYAC, MYDATA, MYDATAEXTRACT, MYFEAT, myvars, myvars1, myvars2)
 # average of each variable for each activity and each subject
 TDAT2 <- TDAT[, lapply(.SD, mean) , by = c("ID", "activity")]
 
+write.table(TDAT2, file = "CP_solution.txt",row.name = FALSE)
 } #if clause end.
 
